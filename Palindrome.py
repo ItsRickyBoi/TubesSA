@@ -34,45 +34,34 @@ def dynamic_programming(s: str) -> (str, str):
                     max_length = k
     return s[start:start + max_length], "O(n²)"
 
-def dynamic_programming2(s: str) -> (str, str):
-    if len(s) <= 1:
-        return s, "O(1)"
-    Max_Len = 1
-    Max_Str = s[0]
-    dp = [[False for _ in range(len(s))] for _ in range(len(s))]
-    for i in range(len(s)):
-        dp[i][i] = True
-        for j in range(i):
-            if s[j] == s[i] and (i-j <= 2 or dp[j+1][i-1]):
-                dp[j][i] = True
-                if i-j+1 > Max_Len:
-                    Max_Len = i-j+1
-                    Max_Str = s[j:i+1]
-    return Max_Str, "O(n²)"
-
 def display_results(result_str):
     result_window = tk.Toplevel(root)
     result_window.title("Results")
-    result_window.geometry("500x200")  # Custom size for the new result window
+    lines = result_str.count('\n') + 1
+    window_height = min(400, max(150, 18 * lines))
+    result_window.geometry(f"500x{window_height}")  
     tk.Label(result_window, text=result_str, justify=tk.LEFT, wraplength=480).pack(pady=10, padx=10)
 
 def find_palindrome():
     user_input = entry.get()
+    if any(char.isdigit() for char in user_input):
+        messagebox.showerror("Input Error", "Input wrong, try again. Only alphabetic strings are allowed.")
+        return
+
     result_str = ""
     result_str += f"Brute Force - Longest Palindrome: ({brute_force(user_input)[0]})\n Time Complexity: {brute_force(user_input)[1]}\n\n"
     result_str += f"Dynamic Programming - Longest Palindrome: ({dynamic_programming(user_input)[0]})\n Time Complexity: {dynamic_programming(user_input)[1]}\n\n"
-    result_str += f"Dynamic Programming2 - Longest Palindrome: ({dynamic_programming2(user_input)[0]})\n Time Complexity: {dynamic_programming2(user_input)[1]}\n\n"
     display_results(result_str)
 
 # Create main window
 root = tk.Tk()
 root.title("Palindrome Finder")
-root.geometry("300x100")  # Adjusted window size to be wider
+root.geometry("300x100")
 
 # Create input textbox
 entry_label = tk.Label(root, text="Enter a string:")
 entry_label.pack(pady=5)
-entry = tk.Entry(root, width=40)  # Made the input entry wider
+entry = tk.Entry(root, width=40) 
 entry.pack(pady=5)
 
 # Create button to find palindrome
