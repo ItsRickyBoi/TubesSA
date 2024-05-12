@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palindrome Finder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Palindrome Finder</h1>
+        <input type="text" id="inputString" placeholder="Enter a string">
+        <button onclick="findPalindrome()">Find Longest Palindrome</button>
+        <h2>Brute Force Visualization</h2>
+        <canvas id="palindromeCanvasBF" width="800" height="200"></canvas>
+        <h2>Dynamic Programming Visualization</h2>
+        <canvas id="palindromeCanvasDP" width="800" height="200"></canvas>
+        <div id="resultBF"></div>
+        <div id="resultDP"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
