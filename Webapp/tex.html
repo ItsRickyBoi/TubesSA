@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palindrome Finder - Visualization</title>
+    <style>
+        body, html {
+            font-family: Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            background: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        canvas {
+            border: 1px solid #ddd; 
+            background-color: #fff; 
+            display: block;
+            margin: 20px auto; 
+        }
+        #resultBF, #resultDP {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Palindrome Finder</h1>
+        <input type="text" id="inputString" placeholder="Enter a string">
+        <button onclick="findPalindrome()">Find Longest Palindrome</button>
+        <h2>Brute Force Visualization</h2>
+        <canvas id="palindromeCanvasBF" width="800" height="200"></canvas>
+        <h2>Dynamic Programming Visualization</h2>
+        <canvas id="palindromeCanvasDP" width="800" height="200"></canvas>
+        <div id="resultBF"></div>
+        <div id="resultDP"></div>
+    </div>
+    <script>
+        function findPalindrome() {
+            let inputString = document.getElementById('inputString').value;
+            if (!/^[a-zA-Z]+$/.test(inputString)) { // Validates that the input contains only alphabetic characters
+                alert("Only alphabetical string inputs are accepted.");
+                return;
+            }
+            clearCanvas('palindromeCanvasBF');
+            clearCanvas('palindromeCanvasDP');
+
+            // Start timing for brute force approach
+            const startBF = performance.now();
+            let resultBF = findLongestPalindromeBF(inputString);
+            const endBF = performance.now();
+            const timeBF = endBF - startBF; // Calculate execution time
+
+            // Start timing for dynamic programming approach
+            const startDP = performance.now();
+            let resultDP = findLongestPalindromeDP(inputString);
+            const endDP = performance.now();
+            const timeDP = endDP - startDP; // Calculate execution time
+
+            // Display results in the webpage
+            document.getElementById('resultBF').innerHTML = `Brute Force - Longest Palindrome: ${resultBF} (Time: ${timeBF.toFixed(2)} ms)`;
+            document.getElementById('resultDP').innerHTML = `Dynamic Programming - Longest Palindrome: ${resultDP} (Time: ${timeDP.toFixed(2)} ms)`;
+        }
+
+        function clearCanvas(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        function findLongestPalindromeBF(s) {
+            const canvas = document.getElementById('palindromeCanvasBF');
+            const ctx = canvas.getContext('2d');
+            const charWidth = canvas.width / s.length;
+            let maxLength = 0, start = 0;
+            for (let i = 0; i < s.length; i++) {
+                for (let j = i; j < s.length; j++) {
+                    if (isPalindrome(s, i, j)) {
+                        drawRectangle(ctx, i, j, charWidth, 'lightcoral', s.substring(i, j+1));
+                        if (j - i + 1 > maxLength) {
+                            maxLength = j - i + 1;
+                            start = i;
+                        }
+                    }
+                }
+            }
+            drawRectangle(ctx, start, start + maxLength - 1, charWidth, 'lightblue', s.substring(start, start + maxLength));
+            return s.substring(start, start + maxLength);
+        }
+        function findLongestPalindromeDP(s) {
+            const canvas = document.getElementById('palindromeCanvasDP');
+            const ctx = canvas.getContext('2d');
+            const charWidth = canvas.width / s.length;
+            let n = s.length;
+            let dp = Array.from(Array(n), () => new Array(n).fill(false));
+            let maxLength = 1, start = 0;
+            for (let i = 0; i < n; i++) {
+                dp[i][i] = true;
+                drawRectangle(ctx, i, i, charWidth, 'lightcoral', s[i]);
+            }
+            for (let i = 0; i < n - 1; i++) {
+                if (s[i] === s[i + 1]) {
+                    dp[i][i + 1] = true;
+                    drawRectangle(ctx, i, i + 1, charWidth, 'lightcoral', s.substring(i, i+2));
+                    start = i;
+                    maxLength = 2;
+                }
+            }
+            for (let len = 3; len <= n; len++) {
+                for (let i = 0; i < n - len + 1; i++) {
+                    let j = i + len - 1;
+                    if (s[i] === s[j] && dp[i + 1][j - 1]) {
+                        dp[i][j] = true;
+                        drawRectangle(ctx, i, j, charWidth, 'lightcoral', s.substring(i, j+1));
+                        if (len > maxLength) {
+                            start = i;
+                            maxLength = len;
+                        }
+                    }
+                }
+            }
+            drawRectangle(ctx, start, start + maxLength - 1, charWidth, 'lightblue', s.substring(start, start + maxLength));
+            return s.substring(start, start + maxLength);
+        }
+        function drawRectangle(ctx, start, end, charWidth, color, text) {
+            ctx.fillStyle = color;
+            ctx.fillRect(start * charWidth, 0, (end - start + 1) * charWidth, 50);
+            ctx.strokeStyle = 'black';
+            ctx.strokeRect(start * charWidth, 0, (end - start + 1) * charWidth, 50);
+            ctx.fillStyle = 'black';
+            ctx.fillText(text, start * charWidth + 5, 25, (end - start + 1) * charWidth);
+        }
+        function isPalindrome(s, left, right) {
+            while (left < right) {
+                if (s[left] !== s[right]) {
+                    return false;
+                }
+                left++;
+                right--;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
